@@ -4,52 +4,11 @@ import datetime
 from datetime import timedelta
 
 
-# a function to find where the category seperator for reserve players
-# starts, that way the first player for the reserves list can be found
-def find_reserve_players_category(football_list: list) -> int:
-    """find where the reserve players category starts"""
-
-    for index, value in enumerate(football_list):
-        if "—" in value:
-            return index
-
-
-# use this to find where the first category ends and second
-# category starts
-def first_instance_finder(football_list: list) -> int:
-    """
-    Find the first instance in a loop where there's a player
-    :return: return the index position
-    """
-
-    for index, value in enumerate(football_list):
-        for char in value:
-            if char == ".":
-                return index
-
-
-def football_list_categoriser(football_list: list) -> list:
-    """
-    Categorise the list into welcome message, football players and reserve players
-
-    Uses previous functions to store indexes of the categories then
-    creates 3 new lists containing the categories and returns them
-    """
-
-    first_category_end = first_instance_finder(football_list) - 1
-    second_category_start = first_category_end + 1
-    third_category_start = find_reserve_players_category(football_list)
-    first_category_list = football_list[:first_category_end + 1]
-    second_category_list = football_list[second_category_start:third_category_start]
-    third_category_list = football_list[third_category_start:]
-    return [first_category_list, second_category_list, third_category_list]
-
-
-def assign_new_date(new_date)->str:
+def assign_new_date(new_date) -> str:
     """ Creates new correct date for football list"""
 
     current_date = datetime.datetime.today()
-    d = datetime.datetime.now()
+    d= datetime.datetime.now()
     correct_date = datetime.datetime.today()
 
     for i in range(8):
@@ -68,52 +27,80 @@ def assign_new_date(new_date)->str:
     return new_date
 
 
-def sort_players(players: list):
-    """sorts the players and gives them the right number"""
+def create_player_list(football_list: list, week_count: int) -> list:
+    """ Create a list/string showing the new football list
 
-    new_players = []
-    new_list = []
-    # figure out where the numbers are and remove them
-    for location, player in enumerate(players):
-        for index, char in enumerate(player):
-            if char == ".":
-                player = str(player[index+1:]).title().split()
-                new_players.append(player)
+    creates a new football list based on the number of people playing
+    and a sorted list in alphabetical order
 
-    # sort the players with the removed number
-    new_players = sorted(new_players)
-    # after sorting add the correct numbrer back again
-    for index, item in enumerate(new_players):
-        new_list.append(f"{index+1}.{''.join(item)}")
-    # return this list of correct nubmer and names
-    return new_list
-
-
-def create_new_list(football_list: list)-> list:
+    :param football_list: The football lsit as a string
+    :param week_count: The number of players for that week
+    :return: new football list to print
     """
-    create a new list by adding the right values to the old list
-    :param football_list:
-    :return: correct list with correct date and sorted names
-    """
-    # loop to edit the three categories of lists
-    for index, item in enumerate(football_list):
-        # for the first category get the correct Date
-        if index == 0:
-            football_list[0] = [assign_new_date(item[0])]
-        # for the second category rearrange and sort the names correctly
-        elif index == 1:
-            football_list[index] = sort_players(item)
-        # for the reserve category do the same(sorting player names and numbers
-        elif index == 2:
-            for index, value in enumerate(item):
-                if index>1:
-                    sort_players(item[index:])
-    # add this all into a new list not as three different lists but as 1
-    organised_list= []
+    # String of new football list
+    new_football_list = []
+    # List to hold all players
+    list_of_all_players = []
+    # list to hold the playing players according to weekly amount
+    list_playing_players = []
+    # list to hold the players that aren't playing but are in reserve
+    list_of_reserve_players = []
+    reserve_player_count = 0
+
+    # First find all the players and add them to a list
     for item in football_list:
-        organised_list.extend(item)
-    # return the organised new list
-    return organised_list
+        if "." in item:
+            player = ""
+            for char in item:
+                if char.isalpha():
+                    player += char
+            if player == "":
+                continue
+            else:
+                list_of_all_players.append(player)
+
+    # Add the number of this week's players to a list
+    for player in list_of_all_players:
+        # Check how many players are playing and add them to a list
+        if len(list_playing_players) < week_count:
+            list_playing_players.append(player)
+    # sort the list alphabetically so its easier organised
+    list_playing_players = sorted(list_playing_players)
+
+    # check if there were players that weren't added to the playing list
+    # and add to reserve
+    if list_of_all_players > list_playing_players:
+        # value to store how many reserve players there are
+        reserve_player_count = len(list_of_all_players) - len(list_playing_players)
+
+        if reserve_player_count > 0:
+            # add the rest of the players to the reserve list
+            # by iterating backwards up to the difference of the number of reserve players
+            list_of_reserve_players.extend(list_of_all_players[:-reserve_player_count-1:-1])
+            # sort the list to make it more readable
+            # list_of_reserve_players = sorted(list_of_reserve_players)
+
+    # create a new list with the football list details
+
+    # if football list is empty add items to empty list
+    if len(new_football_list) <= 0:
+        new_football_list.append(assign_new_date(football_list[0]))
+        new_football_list.append("")
+        for index, player in enumerate(list_playing_players):
+            new_football_list.append(f"{index+1}. {player}")
+        # add the reserve Player dividers
+        new_football_list.append("————————————————")
+        new_football_list.append("Reserves")
+        # check if there are Reserve players
+        if reserve_player_count > 0:
+            # Then add the reserve players
+            for index, reserve_player in enumerate(list_of_reserve_players):
+                new_football_list.append(f"{index+1}. {reserve_player}")
+        else:
+            for i in range(3):
+                new_football_list.append(f"{i+1}. ")
+
+    return new_football_list
 
 
 class MYGUI(QMainWindow):
@@ -129,26 +116,26 @@ class MYGUI(QMainWindow):
             message = QMessageBox()
             message.setText("Editor is Empty")
             message.exec_()
+        # if statements for each combobox
+        elif self.number_of_players_comboBox.currentText() == "":
+            message = QMessageBox()
+            message.setText("Please Select Number of Players")
+            message.exec_()
         else:
             # create a list containing each new line from edit box
-            old_football_list = self.football_list_edit.toPlainText().split("\n")
-            # use previous methods to manipulate list
-            current_football_list = football_list_categoriser(old_football_list)
-            new_football_list = create_new_list(current_football_list)
-            # create a message box
-            message = QMessageBox()
-            # create a string with new lines as message box isn't
-            # suited to list, and string prints out how its formatted
-            # we want the same format we pasted in
+            current_football_list = self.football_list_edit.toPlainText().split("\n")
+            # Create a new football list string using the function
+            new_football_list = create_player_list(current_football_list,int(self.number_of_players_comboBox.currentText()))
+            # Create a new string since textBrowser only passes strings
             new_message = "\n".join(new_football_list)
-            message.setText(new_message)
-            message.exec_()
+            self.football_list_textBrowser.setText(new_message)
 
 
 def main():
     app = QApplication([])
     window = MYGUI()
     app.exec_()
+
 
 if __name__ == '__main__':
     main()
