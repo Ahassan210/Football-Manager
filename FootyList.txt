@@ -1,0 +1,47 @@
+Sample 1:
+Wed 8th Feb - Goals London 8:45 AM, MEET SO WE CAN START EARLY
+
+Thomas
+James
+William
+Benjamin
+Noah
+Ethan
+Daniel
+Jacob
+Matthew
+Joseph
+Samuel
+Henry
+————————————————
+Reserves
+Oliver
+Jack
+Alexander
+
+Sample 2:
+Wed 26th April - Goals Manchester - 8:45 AM, MEET
+
+George
+James
+William
+Benjamin
+Noah
+Ethan
+Daniel
+Jacob
+Matthew
+Joseph
+Samuel
+Henry
+Michael
+David
+Andrew
+Christopher
+Joshua
+Daniel
+—
+Reserves
+Oliver
+Matthew
+Benjamin
